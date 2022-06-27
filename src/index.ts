@@ -3,10 +3,12 @@ import { getOccupationData } from './occupations';
 
 async function main() {
   const occupations = {
-    cashiers: await getOccupationData('pages/occupations/cashiers.html'),
+    cashiers: await getOccupationData('pages/2019/occupations/cashiers.html'),
   };
 
-  // console.log(occupations);
+  console.log(occupations);
+
+  return occupations;
 }
 
 main();

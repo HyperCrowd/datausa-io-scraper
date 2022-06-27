@@ -181,15 +181,16 @@ var getOccupationData = async (fileName) => {
       ]
     }
   };
-  console.log(JSON.stringify(result, null, 2));
-  return contents;
+  return result;
 };
 
 // src/index.ts
 async function main() {
   const occupations = {
-    cashiers: await getOccupationData("pages/occupations/cashiers.html")
+    cashiers: await getOccupationData("pages/2019/occupations/cashiers.html")
   };
+  console.log(occupations);
+  return occupations;
 }
 main();
 //# sourceMappingURL=index.js.map

@@ -16,14 +16,12 @@
     "start": "node -r source-map-support/register dist/index.js",
     "dev": "echo 'Type \"npm run sb-watch\" to get started'",
     "build": "tsup-node --legacy-output --dts --minify --format esm,cjs,iife",
-    "sb-watch": "nodemon --watch src/ -e ts,tsx,js --exec \"tsup-node --dts --onSuccess 'node -r source-map-support/register dist/index.js setText -f test'\"",
+    "sb-watch": "nodemon --watch src/ -e ts,tsx,js --exec \"tsup-node --dts --onSuccess 'node -r source-map-support/register dist/index.js'\"",
     "watch": "tsup-node --watch --dts --onSuccess 'node -r source-map-support/register dist/index.js'",
     "test": "nodemon --watch tests/ --watch src/ -e ts,tsx,js --exec \"tsup-node --entry.tests=tests/index.ts --onSuccess 'uvu -r source-map-support/register dist ^tests.js$'\""
   },
   "tsup": {
-    "entry": [
-      "src/index.ts"
-    ],
+    "entry": ["src/index.ts"],
     "splitting": false,
     "sourcemap": true,
     "clean": false,
@@ -32,9 +30,7 @@
   "main": "./dist/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/index.d.ts",
-  "files": [
-    "/dist"
-  ],
+  "files": ["/dist"],
   "devDependencies": {
     "@types/node": "^17.0.41",
     "nodemon": "^2.0.16",

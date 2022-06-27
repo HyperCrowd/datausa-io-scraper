@@ -2,15 +2,15 @@ import { scrape } from './scraper';
 
 const nonNumbers = /[^0-9\.\-]/g;
 
-function getCode(code: string) {
+function getCode(code: string = '') {
   return code.replace('/profile/', '');
 }
 
-function getGeo(str: string) {
+function getGeo(str: string = '') {
   const code = str.replace('/profile/geo/', '');
 }
 
-function getNumber(str: string) {
+function getNumber(str: string = '') {
   const last = str[str.length - 1];
 
   switch (last) {
@@ -31,11 +31,13 @@ function getNumber(str: string) {
 
 export const getOccupationData = async (fileName: string) => {
   const json = await scrape(fileName);
+
   const contents =
-    json[2].children[3].children[1].children[0].children[0].children[0]
+    json[2].children[2].children[1].children[0].children[0].children[0]
       .children[1].children;
 
   const result = {
+    fileName,
     workforce: {
       size: getNumber(
         contents[0]?.children[4]?.children[0]?.children[0]?.children[1]?.children[0].content.trim()

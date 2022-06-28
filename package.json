@@ -1,16 +1,16 @@
 {
-  "name": "@psysecgroup/typescript-server-template",
+  "name": "@psysecgroup/datausa-io-scraper",
   "description": "Easily sets up TypeScript server-side projects that are StackBlitz compliant.",
   "version": "1.0.0",
   "author": "The PsySec Group",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/PsySecGroup/typescript-server-template/issues"
+    "url": "https://github.com/HyperCrowd/datausa-io-scraper"
   },
-  "homepage": "https://github.com/PsySecGroup/typescript-server-template#readme",
+  "homepage": "https://github.com/HyperCrowd/datausa-io-scraper#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PsySecGroup/typescript-server-template.git"
+    "url": "git+https://github.com/HyperCrowd/datausa-io-scraper.git"
   },
   "scripts": {
     "start": "node -r source-map-support/register dist/index.js",
@@ -46,6 +46,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "commander": "^9.3.0",
+    "json2csv": "^5.0.7",
     "ts-node": "^10.8.1"
   }
 }

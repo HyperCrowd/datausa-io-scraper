@@ -7,8 +7,9 @@ function getCode(code: string = '') {
 }
 
 function getGeo(str: string = '') {
-  const code = str.replace('/profile/geo/', '');
+  return str.replace('/profile/geo/', '');
 }
+
 
 function getNumber(str: string = '') {
   const last = str[str.length - 1];
@@ -22,7 +23,11 @@ function getNumber(str: string = '') {
       return parseFloat(str.substring(0, str.length - 1)) * 1000000;
     case '%':
       return (
-        parseFloat(str.replace('−', '-').substring(0, str.length - 1)) / 100
+        parseFloat(str
+          .replace('−', '-')
+          .replace(' ', '')
+          .replace('±', '')
+          .substring(0, str.length - 1)) / 100
       );
     default:
       return parseFloat(str.replace('−', '-').replace(nonNumbers, ''));
@@ -30,6 +35,165 @@ function getNumber(str: string = '') {
 }
 
 export const getOccupationData = async (fileName: string) => {
+  const $ = await scrape(fileName);
+
+  const result = {
+    fileName,
+    workforce: {
+      size: getNumber(
+        $('#Profile > div.Section.employment > div.section-topics > div.topic.tmap_ind.TextViz > div.topic-content > div.topic-stats > div:nth-child(1) > div.stat-value').text().trim()
+      ),
+      oneYearGrowth: {
+        value: getNumber(
+          $('#Profile > div.Section.employment > div.section-topics > div.topic.tmap_ind.TextViz > div.topic-content > div.topic-stats > div:nth-child(2) > div.stat-value').text().trim()
+        ),
+        errorRate: getNumber(
+          $('#Profile > div.Section.employment > div.section-topics > div.topic.tmap_ind.TextViz > div.topic-content > div.topic-stats > div:nth-child(2) > div.stat-subtitle').text().trim()
+        ),
+      },
+      mostlyEmployedBy: $('#Profile > div.Section.employment > div.section-body > div > div > div > p > a').map(function () {
+        const attr = $(this).attr('href')
+        if (attr.indexOf('/geo/') > -1) {
+          return
+        }
+
+        return {
+          name: $(this).text(),
+          code: getCode(attr)
+        }
+      }).toArray(),
+      averageSalary: getNumber(
+        $('#Profile > div.Section.employment > div.section-topics > div.topic.wage_by_industry.TextViz > div.topic-content > div.topic-stats > div > div.stat-value').text()
+      ),
+      averageAge: getNumber(
+        $('#Splash > div:nth-child(5) > div > div:nth-child(2) > div.stat-value').text()
+      ),
+    },
+    gender: {
+      count: {
+        male: getNumber(
+          $('#Profile > div.Section.demographics > div.section-topics > div.topic.sex.TextViz > div.topic-content > div.topic-stats > div:nth-child(1) > div.stat-value').text()
+        ),
+        female: getNumber(
+          $('#Profile > div.Section.demographics > div.section-topics > div.topic.sex.TextViz > div.topic-content > div.topic-stats > div:nth-child(2) > div.stat-value').text()
+        ),
+      },
+      averageSalary: {
+        male: getNumber(
+          $('#Splash > div:nth-child(5) > div > div:nth-child(4) > div.stat-value').text()
+        ),
+        female: getNumber(
+          $('#Splash > div:nth-child(5) > div > div:nth-child(5) > div.stat-value').text()
+        ),
+      },
+      averageAge: {
+        male: getNumber(
+          $('#Profile > div.Section.demographics > div.section-topics > div.topic.age_sex.TextViz > div.topic-content > div.topic-stats > div:nth-child(1) > div.stat-value').text()
+        ),
+        female: getNumber(
+          $('#Profile > div.Section.demographics > div.section-topics > div.topic.age_sex.TextViz > div.topic-content > div.topic-stats > div:nth-child(2) > div.stat-value').text()
+        ),
+      },
+    },
+    locations: {
+      highestPaying: [
+        {
+          name: $('#Profile > div.Section.employment > div.section-topics > div.topic.wage_locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(1) > div.stat-value > a').text(),
+          geo: getGeo(
+            $('#Profile > div.Section.employment > div.section-topics > div.topic.wage_locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(1) > div.stat-value > a').attr('href')
+          ),
+        },
+        {
+          name: $('#Profile > div.Section.employment > div.section-topics > div.topic.wage_locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(2) > div.stat-value > a').text(),
+          geo: getGeo(
+            $('#Profile > div.Section.employment > div.section-topics > div.topic.wage_locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(2) > div.stat-value > a').attr('href')
+          ),
+        },
+        {
+          name: $('#Profile > div.Section.employment > div.section-topics > div.topic.wage_locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(3) > div.stat-value > a').text(),
+          geo: getGeo(
+            $('#Profile > div.Section.employment > div.section-topics > div.topic.wage_locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(3) > div.stat-value > a').attr('href')
+          ),
+        },
+      ],
+      relativelyHighConcentration: [
+        {
+          name: $('#Profile > div.Section.employment > div.section-topics > div.topic.locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(1) > div.stat-value > a').text(),
+          geo: getGeo(
+            $('#Profile > div.Section.employment > div.section-topics > div.topic.locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(1) > div.stat-value > a').attr('href')
+          ),
+        },
+        {
+          name: $('#Profile > div.Section.employment > div.section-topics > div.topic.locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(2) > div.stat-value > a').text(),
+          geo: getGeo(
+            $('#Profile > div.Section.employment > div.section-topics > div.topic.locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(2) > div.stat-value > a').attr('href')
+          ),
+        },
+        {
+          name: $('#Profile > div.Section.employment > div.section-topics > div.topic.locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(3) > div.stat-value > a').text(),
+          geo: getGeo(
+            $('#Profile > div.Section.employment > div.section-topics > div.topic.locations.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(3) > div.stat-value > a').attr('href')
+          ),
+        },
+      ],
+    },
+    ethnicity: {
+      mostCommon: [
+        $('#Profile > div.Section.demographics > div.section-topics > div.topic.ethnicity.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(1) > div.stat-value').text(),
+        $('#Profile > div.Section.demographics > div.section-topics > div.topic.ethnicity.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(2) > div.stat-value').text(),
+        $('#Profile > div.Section.demographics > div.section-topics > div.topic.ethnicity.TextViz > div.topic-content > div.topic-stats > div > ol > li:nth-child(3) > div.stat-value').text(),
+      ],
+    },
+    skills: {
+      mostCommonMajors: [
+        {
+          name: $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(1) > ol > li:nth-child(1) > div.stat-value > a').text(),
+          code: getCode(
+            $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(1) > ol > li:nth-child(1) > div.stat-value > a').attr('href')
+          ),
+        },
+        {
+          name: $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(1) > ol > li:nth-child(2) > div.stat-value > a').text(),
+          code: getCode(
+            $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(1) > ol > li:nth-child(1) > div.stat-value > a').attr('href')
+          ),
+        },
+        {
+          name: $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(1) > ol > li:nth-child(3) > div.stat-value > a').text(),
+          code: getCode(
+            $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(1) > ol > li:nth-child(3) > div.stat-value > a').attr('href')
+          ),
+        },
+      ],
+      mostSpecializedMajors: [
+        {
+          name: $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(2) > ol > li:nth-child(1) > div.stat-value > a').text(),
+          code: getCode(
+            $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(2) > ol > li:nth-child(1) > div.stat-value > a').attr('href')
+          ),
+        },
+        {
+          name: $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(2) > ol > li:nth-child(2) > div.stat-value > a').text(),
+          code: getCode(
+            $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(2) > ol > li:nth-child(2) > div.stat-value > a').attr('href')
+          ),
+        },
+        {
+          name: $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(2) > ol > li:nth-child(3) > div.stat-value > a').text(),
+          code: getCode(
+            $('#Profile > div.Section.education > div.section-topics > div > div.topic-content > div.topic-stats > div:nth-child(2) > ol > li:nth-child(3) > div.stat-value > a').attr('href')
+          ),
+        },
+      ],
+    },
+  };
+
+  return result;
+};
+
+
+/*
+export const oldGetOccupationData = async (fileName: string) => {
   const json = await scrape(fileName);
 
   const contents =
@@ -160,7 +324,8 @@ export const getOccupationData = async (fileName: string) => {
         {
           name: contents[1]?.children[1]?.children[0]?.children[0]?.children[2]?.children[0]?.children[11]?.children[0]?.content.trim(),
           geo: getGeo(
-            contents[1]?.children[1]?.children[0]?.children[0]?.children[2]?.children[0]?.children[11]?.attributes[0]?.value.trim()
+            getChild([1, 1, 0, 0, 2, 0, 11, 0], contents, 'value')
+            // contents[1]?.children[1]?.children[0]?.children[0]?.children[2]?.children[0]?.children[11]?.attributes[0]?.value.trim()
           ),
         },
       ],
@@ -186,7 +351,8 @@ export const getOccupationData = async (fileName: string) => {
       ],
       relativelyHighConcentration: [
         {
-          name: contents[2]?.children[2]?.children[4]?.children[0]?.children[1]?.children[0]?.children[1]?.children[0]?.children[0]?.children[0]?.children[0]?.content.trim(),
+          // name: contents[2]?.children[2]?.children[4]?.children[0]?.children[1]?.children[0]?.children[1]?.children[0]?.children[0]?.children[0]?.children[0]?.content.trim(),
+          name: getChild([2, 2, 4, 0, 1, 0, 1, 0, 0, 0, 0], contents, 'content'),
           geo: getGeo(
             contents[2]?.children[2]?.children[4]?.children[0]?.children[1]?.children[0]?.children[1]?.children[0]?.children[0]?.children[0]?.attributes[0]?.value.trim()
           ),
@@ -258,3 +424,4 @@ export const getOccupationData = async (fileName: string) => {
 
   return result;
 };
+*/
